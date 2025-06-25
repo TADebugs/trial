@@ -96,7 +96,7 @@
           desc: 'The largest planet in our solar system, a gas giant with a prominent Great Red Spot.',
           fact: 'Fun fact: Jupiter is so big that over 1,300 Earths could fit inside it!',
           model: '#jupiterModel',
-          scale: '5.2 5.2 5.2',
+          scale: '2 2 2',
         },
       };
       const planetSelect = document.getElementById('planetSelect');
@@ -109,6 +109,8 @@
         const data = planetData[selected];
         planetEntity.setAttribute('gltf-model', data.model);
         planetEntity.setAttribute('scale', data.scale);
+        planetEntity.setAttribute('position', '0 0 0');
+        planetEntity.setAttribute('rotation', '0 180 0');
         planetName.textContent = data.name;
         planetDesc.textContent = data.desc;
         planetFact.textContent = data.fact;
