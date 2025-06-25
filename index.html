@@ -66,11 +66,28 @@
       </a-assets>
       <a-marker preset="hiro">
         <a-entity 
-          id="planetEntity"
+          id="earthEntity"
           gltf-model="#earthModel" 
           scale="1 1 1" 
           position="0 0 0"
-          rotation="0 180 0">
+          rotation="0 180 0"
+          visible="true">
+        </a-entity>
+        <a-entity 
+          id="marsEntity"
+          gltf-model="#marsModel" 
+          scale="0.53 0.53 0.53" 
+          position="0 0 0"
+          rotation="0 180 0"
+          visible="false">
+        </a-entity>
+        <a-entity 
+          id="jupiterEntity"
+          gltf-model="#jupiterModel" 
+          scale="2 2 2" 
+          position="0 0 0"
+          rotation="0 180 0"
+          visible="false">
         </a-entity>
       </a-marker>
       <a-entity camera></a-entity>
@@ -100,17 +117,20 @@
         },
       };
       const planetSelect = document.getElementById('planetSelect');
-      const planetEntity = document.getElementById('planetEntity');
+      const planetEntities = {
+        earth: document.getElementById('earthEntity'),
+        mars: document.getElementById('marsEntity'),
+        jupiter: document.getElementById('jupiterEntity'),
+      };
       const planetName = document.getElementById('planetName');
       const planetDesc = document.getElementById('planetDesc');
       const planetFact = document.getElementById('planetFact');
       planetSelect.addEventListener('change', (e) => {
         const selected = planetSelect.value;
+        Object.keys(planetEntities).forEach(key => {
+          planetEntities[key].setAttribute('visible', key === selected);
+        });
         const data = planetData[selected];
-        planetEntity.setAttribute('gltf-model', data.model);
-        planetEntity.setAttribute('scale', data.scale);
-        planetEntity.setAttribute('position', '0 0 0');
-        planetEntity.setAttribute('rotation', '0 180 0');
         planetName.textContent = data.name;
         planetDesc.textContent = data.desc;
         planetFact.textContent = data.fact;
