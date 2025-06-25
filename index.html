@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AR Planet Flashcards</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.7/aframe/build/aframe-ar.min.js"></script>
+  </head>
+  <body style="margin : 0px; overflow: hidden;">
+    <a-scene embedded arjs>
+      <a-assets>
+        <a-asset-item id="planetModel" src="planet_earth.glb"></a-asset-item>
+      </a-assets>
+
+      <a-marker preset="hiro">
+        <a-entity 
+          gltf-model="#planetModel"
+          scale="0.5 0.5 0.5"
+          position="0 0 0"
+          rotation="0 180 0">
+        </a-entity>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
+</html>
