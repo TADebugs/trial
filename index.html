@@ -3,28 +3,116 @@
   <head>
     <title>AR Planet Flashcards</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
-<link rel="icon" href="data:,">
-
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+    <link rel="icon" href="data:,">
+    <style>
+      #planet-selector {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+        background: rgba(255,255,255,0.9);
+        border-radius: 8px;
+        padding: 10px 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        font-family: sans-serif;
+      }
+      #planet-info {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        background: rgba(0,0,0,0.8);
+        color: #fff;
+        border-radius: 10px;
+        padding: 18px 28px;
+        min-width: 250px;
+        max-width: 90vw;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+        font-family: sans-serif;
+        font-size: 1.1em;
+        text-align: center;
+      }
+      #planet-info h2 {
+        margin: 0 0 8px 0;
+        font-size: 1.3em;
+      }
+      #planet-info p {
+        margin: 6px 0;
+      }
+    </style>
   </head>
-  
   <body style="margin : 0px; overflow: hidden;">
+    <div id="planet-selector">
+      <label for="planetSelect"><b>Select Planet:</b></label>
+      <select id="planetSelect">
+        <option value="earth">Earth</option>
+        <option value="mars">Mars</option>
+        <option value="jupiter">Jupiter</option>
+      </select>
+    </div>
+    <div id="planet-info">
+      <h2 id="planetName">Earth</h2>
+      <p id="planetDesc">Our home planet, the third from the Sun and the only known world to support life.</p>
+      <p id="planetFact"><i>Fun fact: 71% of Earth's surface is covered by water!</i></p>
+      <p style="font-size:0.95em;opacity:0.7;margin-top:10px;">*Planet sizes are shown to scale for reference.</p>
+    </div>
     <a-scene embedded arjs>
-        <a-assets>
-          <a-asset-item id="planetModel" src="planet_earth.glb"></a-asset-item>
-        </a-assets>
-      
-        <a-marker preset="hiro">
-          <a-entity 
-            gltf-model="#planetModel" 
-            scale="1 1 1" 
-            position="0 0 0"
-            rotation="0 180 0">
-          </a-entity>
-        </a-marker>
-      
-        <a-entity camera></a-entity>
-      </a-scene>
-      
+      <a-assets>
+        <a-asset-item id="earthModel" src="planet_earth.glb"></a-asset-item>
+        <a-asset-item id="marsModel" src="planet_mars.glb"></a-asset-item>
+        <a-asset-item id="jupiterModel" src="realistic_jupiter.glb"></a-asset-item>
+      </a-assets>
+      <a-marker preset="hiro">
+        <a-entity 
+          id="planetEntity"
+          gltf-model="#earthModel" 
+          scale="1 1 1" 
+          position="0 0 0"
+          rotation="0 180 0">
+        </a-entity>
+      </a-marker>
+      <a-entity camera></a-entity>
+    </a-scene>
+    <script>
+      const planetData = {
+        earth: {
+          name: 'Earth',
+          desc: 'Our home planet, the third from the Sun and the only known world to support life.',
+          fact: 'Fun fact: 71% of Earth\'s surface is covered by water!',
+          model: '#earthModel',
+          scale: '1 1 1',
+        },
+        mars: {
+          name: 'Mars',
+          desc: 'The fourth planet from the Sun, known as the Red Planet due to its reddish appearance.',
+          fact: 'Fun fact: Mars has the tallest volcano in the solar system, Olympus Mons!',
+          model: '#marsModel',
+          scale: '0.53 0.53 0.53',
+        },
+        jupiter: {
+          name: 'Jupiter',
+          desc: 'The largest planet in our solar system, a gas giant with a prominent Great Red Spot.',
+          fact: 'Fun fact: Jupiter is so big that over 1,300 Earths could fit inside it!',
+          model: '#jupiterModel',
+          scale: '5.2 5.2 5.2',
+        },
+      };
+      const planetSelect = document.getElementById('planetSelect');
+      const planetEntity = document.getElementById('planetEntity');
+      const planetName = document.getElementById('planetName');
+      const planetDesc = document.getElementById('planetDesc');
+      const planetFact = document.getElementById('planetFact');
+      planetSelect.addEventListener('change', (e) => {
+        const selected = planetSelect.value;
+        const data = planetData[selected];
+        planetEntity.setAttribute('gltf-model', data.model);
+        planetEntity.setAttribute('scale', data.scale);
+        planetName.textContent = data.name;
+        planetDesc.textContent = data.desc;
+        planetFact.textContent = data.fact;
+      });
+    </script>
   </body>
 </html>
