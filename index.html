@@ -4,6 +4,7 @@
     <title>AR Planet Flashcards</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://unpkg.com/aframe-gesture-handler@1.1.7/dist/aframe-gesture-handler.min.js"></script>
     <link rel="icon" href="data:,">
     <style>
       #planet-selector {
@@ -71,7 +72,9 @@
           scale="1 1 1" 
           position="0 0 0"
           rotation="0 180 0"
-          visible="true">
+          visible="true"
+          animation="property: rotation; to: 0 540 0; loop: true; dur: 15000; easing: linear"
+          gesture-handler>
         </a-entity>
         <a-entity 
           id="marsEntity"
@@ -79,7 +82,9 @@
           scale="0.53 0.53 0.53" 
           position="0 0 0"
           rotation="0 180 0"
-          visible="false">
+          visible="false"
+          animation="property: rotation; to: 0 540 0; loop: true; dur: 12000; easing: linear"
+          gesture-handler>
         </a-entity>
         <a-entity 
           id="jupiterEntity"
@@ -87,7 +92,9 @@
           scale="0.005 0.005 0.005" 
           position="0 0 0"
           rotation="0 180 0"
-          visible="false">
+          visible="false"
+          animation="property: rotation; to: 0 540 0; loop: true; dur: 8000; easing: linear"
+          gesture-handler>
         </a-entity>
       </a-marker>
       <a-entity camera></a-entity>
