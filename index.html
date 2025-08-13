@@ -265,6 +265,12 @@
           currentPlanet = getCurrentPlanetEntity();
           console.log('Mouse down - Dragging started on planet:', currentPlanet);
           
+          // Pause the automatic rotation animation when dragging starts
+          if (currentPlanet) {
+            currentPlanet.setAttribute('animation', 'enabled: false');
+            console.log('Automatic rotation paused');
+          }
+          
           // Change cursor to indicate dragging
           document.body.style.cursor = 'grabbing';
           e.preventDefault(); // Prevent default behavior
@@ -298,6 +304,18 @@
       document.addEventListener('mouseup', (e) => {
         if (isDragging) {
           console.log('Mouse up - Dragging stopped');
+          
+          // Resume the automatic rotation animation when dragging stops
+          if (currentPlanet) {
+            const selected = planetSelect.value;
+            const rotationSpeed = selected === 'earth' ? 15000 : selected === 'mars' ? 12000 : 8000;
+            const currentRotation = currentPlanet.getAttribute('rotation');
+            
+            // Continue rotation from current position, not reset to original
+            const targetY = currentRotation.y + 360; // Add 360 degrees to current Y rotation
+            currentPlanet.setAttribute('animation', `property: rotation; to: ${currentRotation.x} ${targetY} ${currentRotation.z}; loop: true; dur: ${rotationSpeed}; easing: linear`);
+            console.log('Automatic rotation resumed from current position:', currentRotation);
+          }
         }
         isDragging = false;
         currentPlanet = null;
