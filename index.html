@@ -213,6 +213,26 @@
         return planetEntities[selected];
       }
       
+      // Add hover effect for planets
+      function addPlanetHoverEffects() {
+        Object.values(planetEntities).forEach(entity => {
+          entity.addEventListener('mouseenter', () => {
+            if (!isDragging) {
+              document.body.style.cursor = 'grab';
+            }
+          });
+          
+          entity.addEventListener('mouseleave', () => {
+            if (!isDragging) {
+              document.body.style.cursor = 'default';
+            }
+          });
+        });
+      }
+      
+      // Initialize hover effects
+      addPlanetHoverEffects();
+      
       // Mouse wheel zoom
       document.addEventListener('wheel', (e) => {
         e.preventDefault();
@@ -243,6 +263,11 @@
           lastMouseX = e.clientX;
           lastMouseY = e.clientY;
           currentPlanet = getCurrentPlanetEntity();
+          console.log('Mouse down - Dragging started on planet:', currentPlanet);
+          
+          // Change cursor to indicate dragging
+          document.body.style.cursor = 'grabbing';
+          e.preventDefault(); // Prevent default behavior
         }
       });
       
@@ -252,22 +277,39 @@
         const deltaX = e.clientX - lastMouseX;
         const deltaY = e.clientY - lastMouseY;
         
-        const currentRotation = currentPlanet.getAttribute('rotation');
-        const newRotation = {
-          x: currentRotation.x + deltaY * 0.5, // Vertical mouse movement affects X rotation
-          y: currentRotation.y + deltaX * 0.5, // Horizontal mouse movement affects Y rotation
-          z: currentRotation.z
-        };
-        
-        currentPlanet.setAttribute('rotation', newRotation);
+        // Only rotate if there's significant movement
+        if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
+          const currentRotation = currentPlanet.getAttribute('rotation');
+          const newRotation = {
+            x: currentRotation.x + deltaY * 0.5, // Increased sensitivity
+            y: currentRotation.y + deltaX * 0.5,
+            z: currentRotation.z
+          };
+          
+          currentPlanet.setAttribute('rotation', newRotation);
+          console.log('Mouse move - Rotating planet:', newRotation);
+        }
         
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
+        e.preventDefault(); // Prevent default behavior
       });
       
-      document.addEventListener('mouseup', () => {
+      document.addEventListener('mouseup', (e) => {
+        if (isDragging) {
+          console.log('Mouse up - Dragging stopped');
+        }
         isDragging = false;
         currentPlanet = null;
+        
+        // Reset cursor
+        document.body.style.cursor = 'default';
+        e.preventDefault(); // Prevent default behavior
+      });
+      
+      // Prevent context menu on right click
+      document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
       });
       
       // Keyboard controls
