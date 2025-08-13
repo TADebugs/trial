@@ -54,6 +54,9 @@
         <option value="jupiter">Jupiter</option>
       </select>
       <button id="resetZoom" style="margin-left: 10px; padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; background: #f0f0f0; cursor: pointer;">Reset Zoom</button>
+      <div style="margin-top: 8px; font-size: 0.8em; color: #666;">
+        <strong>Desktop Controls:</strong> Scroll to zoom • Click+drag to rotate • +/- keys to zoom • R to reset
+      </div>
     </div>
     <div id="planet-info">
       <h2 id="planetName">Earth</h2>
@@ -197,6 +200,115 @@
       
       // Start fact rotation for Earth initially
       startFactRotation('earth');
+      
+      // Desktop controls (mouse and keyboard)
+      let isDragging = false;
+      let lastMouseX = 0;
+      let lastMouseY = 0;
+      let currentPlanet = null;
+      
+      // Get the currently visible planet entity
+      function getCurrentPlanetEntity() {
+        const selected = planetSelect.value;
+        return planetEntities[selected];
+      }
+      
+      // Mouse wheel zoom
+      document.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const entity = getCurrentPlanetEntity();
+        if (!entity) return;
+        
+        const currentScale = entity.getAttribute('scale');
+        const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1; // Scroll up = zoom in, down = zoom out
+        
+        let newScale = {
+          x: currentScale.x * zoomFactor,
+          y: currentScale.y * zoomFactor,
+          z: currentScale.z * zoomFactor
+        };
+        
+        // Limit scale between 0.5 and 3.0
+        newScale.x = Math.max(0.5, Math.min(3.0, newScale.x));
+        newScale.y = Math.max(0.5, Math.min(3.0, newScale.y));
+        newScale.z = Math.max(0.5, Math.min(3.0, newScale.z));
+        
+        entity.setAttribute('scale', newScale);
+      });
+      
+      // Mouse drag rotation
+      document.addEventListener('mousedown', (e) => {
+        if (e.button === 0) { // Left mouse button only
+          isDragging = true;
+          lastMouseX = e.clientX;
+          lastMouseY = e.clientY;
+          currentPlanet = getCurrentPlanetEntity();
+        }
+      });
+      
+      document.addEventListener('mousemove', (e) => {
+        if (!isDragging || !currentPlanet) return;
+        
+        const deltaX = e.clientX - lastMouseX;
+        const deltaY = e.clientY - lastMouseY;
+        
+        const currentRotation = currentPlanet.getAttribute('rotation');
+        const newRotation = {
+          x: currentRotation.x + deltaY * 0.5, // Vertical mouse movement affects X rotation
+          y: currentRotation.y + deltaX * 0.5, // Horizontal mouse movement affects Y rotation
+          z: currentRotation.z
+        };
+        
+        currentPlanet.setAttribute('rotation', newRotation);
+        
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+      });
+      
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        currentPlanet = null;
+      });
+      
+      // Keyboard controls
+      document.addEventListener('keydown', (e) => {
+        const entity = getCurrentPlanetEntity();
+        if (!entity) return;
+        
+        const currentScale = entity.getAttribute('scale');
+        const currentRotation = entity.getAttribute('rotation');
+        
+        switch(e.key) {
+          case '+':
+          case '=':
+            // Zoom in
+            const zoomInScale = {
+              x: Math.min(3.0, currentScale.x * 1.1),
+              y: Math.min(3.0, currentScale.y * 1.1),
+              z: Math.min(3.0, currentScale.z * 1.1)
+            };
+            entity.setAttribute('scale', zoomInScale);
+            break;
+          case '-':
+            // Zoom out
+            const zoomOutScale = {
+              x: Math.max(0.5, currentScale.x * 0.9),
+              y: Math.max(0.5, currentScale.y * 0.9),
+              z: Math.max(0.5, currentScale.z * 0.9)
+            };
+            entity.setAttribute('scale', zoomOutScale);
+            break;
+          case 'r':
+          case 'R':
+            // Reset view
+            const selected = planetSelect.value;
+            const originalScale = planetData[selected].scale;
+            entity.setAttribute('scale', originalScale);
+            entity.setAttribute('position', '0 0 0');
+            entity.setAttribute('rotation', '0 180 0');
+            break;
+        }
+      });
       
       // Reset zoom functionality
       const resetZoomBtn = document.getElementById('resetZoom');
