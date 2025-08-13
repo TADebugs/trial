@@ -5,6 +5,7 @@
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
     <script src="https://unpkg.com/aframe-gesture-handler@1.1.7/dist/aframe-gesture-handler.min.js"></script>
+    <script src="https://unpkg.com/aframe-pinch-handler@1.0.0/dist/aframe-pinch-handler.min.js"></script>
     <link rel="icon" href="data:,">
     <style>
       #planet-selector {
@@ -52,6 +53,7 @@
         <option value="mars">Mars</option>
         <option value="jupiter">Jupiter</option>
       </select>
+      <button id="resetZoom" style="margin-left: 10px; padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; background: #f0f0f0; cursor: pointer;">Reset Zoom</button>
     </div>
     <div id="planet-info">
       <h2 id="planetName">Earth</h2>
@@ -74,7 +76,8 @@
           rotation="0 180 0"
           visible="true"
           animation="property: rotation; to: 0 540 0; loop: true; dur: 15000; easing: linear"
-          gesture-handler>
+          gesture-handler="minScale: 0.5; maxScale: 3.0"
+          pinch-handler>
         </a-entity>
         <a-entity 
           id="marsEntity"
@@ -84,7 +87,8 @@
           rotation="0 180 0"
           visible="false"
           animation="property: rotation; to: 0 540 0; loop: true; dur: 12000; easing: linear"
-          gesture-handler>
+          gesture-handler="minScale: 0.5; maxScale: 3.0"
+          pinch-handler>
         </a-entity>
         <a-entity 
           id="jupiterEntity"
@@ -94,7 +98,8 @@
           rotation="0 180 0"
           visible="false"
           animation="property: rotation; to: 0 540 0; loop: true; dur: 8000; easing: linear"
-          gesture-handler>
+          gesture-handler="minScale: 0.5; maxScale: 3.0"
+          pinch-handler>
         </a-entity>
       </a-marker>
       <a-entity camera></a-entity>
@@ -104,21 +109,39 @@
         earth: {
           name: 'Earth',
           desc: 'Our home planet, the third from the Sun and the only known world to support life.',
-          fact: 'Fun fact: 71% of Earth\'s surface is covered by water!',
+          facts: [
+            'Fun fact: 71% of Earth\'s surface is covered by water!',
+            'Fun fact: Earth is the only planet known to have life!',
+            'Fun fact: Earth\'s atmosphere is 78% nitrogen and 21% oxygen!',
+            'Fun fact: Earth has one natural satellite - the Moon!',
+            'Fun fact: Earth\'s magnetic field protects us from solar radiation!'
+          ],
           model: '#earthModel',
           scale: '1 1 1',
         },
         mars: {
           name: 'Mars',
           desc: 'The fourth planet from the Sun, known as the Red Planet due to its reddish appearance.',
-          fact: 'Fun fact: Mars has the tallest volcano in the solar system, Olympus Mons!',
+          facts: [
+            'Fun fact: Mars has the tallest volcano in the solar system, Olympus Mons!',
+            'Fun fact: A day on Mars is only 37 minutes longer than Earth!',
+            'Fun fact: Mars has two moons: Phobos and Deimos!',
+            'Fun fact: The red color comes from iron oxide (rust) on its surface!',
+            'Fun fact: Mars has the largest canyon in the solar system, Valles Marineris!'
+          ],
           model: '#marsModel',
           scale: '0.53 0.53 0.53',
         },
         jupiter: {
           name: 'Jupiter',
           desc: 'The largest planet in our solar system, a gas giant with a prominent Great Red Spot.',
-          fact: 'Fun fact: Jupiter is so big that over 1,300 Earths could fit inside it!',
+          facts: [
+            'Fun fact: Jupiter is so big that over 1,300 Earths could fit inside it!',
+            'Fun fact: Jupiter has 79 known moons!',
+            'Fun fact: The Great Red Spot is a storm that has been raging for over 300 years!',
+            'Fun fact: Jupiter spins faster than any other planet - a day is only 10 hours!',
+            'Fun fact: Jupiter\'s magnetic field is 14 times stronger than Earth\'s!'
+          ],
           model: '#jupiterModel',
           scale: '0.005 0.005 0.005',
         },
@@ -132,6 +155,32 @@
       const planetName = document.getElementById('planetName');
       const planetDesc = document.getElementById('planetDesc');
       const planetFact = document.getElementById('planetFact');
+      
+      // Fact rotation system
+      let currentFactIndex = 0;
+      let factRotationInterval;
+      
+      function startFactRotation(planetKey) {
+        if (factRotationInterval) {
+          clearInterval(factRotationInterval);
+        }
+        
+        const facts = planetData[planetKey].facts;
+        currentFactIndex = 0;
+        
+        factRotationInterval = setInterval(() => {
+          currentFactIndex = (currentFactIndex + 1) % facts.length;
+          planetFact.textContent = facts[currentFactIndex];
+        }, 3000); // Change fact every 3 seconds
+      }
+      
+      function stopFactRotation() {
+        if (factRotationInterval) {
+          clearInterval(factRotationInterval);
+          factRotationInterval = null;
+        }
+      }
+      
       planetSelect.addEventListener('change', (e) => {
         const selected = planetSelect.value;
         Object.keys(planetEntities).forEach(key => {
@@ -140,7 +189,30 @@
         const data = planetData[selected];
         planetName.textContent = data.name;
         planetDesc.textContent = data.desc;
-        planetFact.textContent = data.fact;
+        planetFact.textContent = data.facts[0]; // Display the first fact initially
+        
+        // Start rotating facts for the selected planet
+        startFactRotation(selected);
+      });
+      
+      // Start fact rotation for Earth initially
+      startFactRotation('earth');
+      
+      // Reset zoom functionality
+      const resetZoomBtn = document.getElementById('resetZoom');
+      resetZoomBtn.addEventListener('click', () => {
+        const selected = planetSelect.value;
+        const entity = planetEntities[selected];
+        const originalScale = planetData[selected].scale;
+        
+        // Reset to original scale
+        entity.setAttribute('scale', originalScale);
+        
+        // Reset position to center
+        entity.setAttribute('position', '0 0 0');
+        
+        // Reset rotation to original
+        entity.setAttribute('rotation', '0 180 0');
       });
     </script>
   </body>
